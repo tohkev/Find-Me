@@ -6,7 +6,7 @@ import {
   Switch,
 } from "react-router-dom";
 
-//route allows you to specify the route path to render a certain component
+//route allows you to render a certain component based on the url path
 //redirect allows you to redirect the path when the one specified is unknown
 //switch allows you to render only one route if that route applies (if none, then it will use redirect)
 import Users from "./users/pages/Users";
