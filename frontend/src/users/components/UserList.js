@@ -23,7 +23,7 @@ function UserList(props) {
     );
   }
 
-  return <ul>{userItemElements}</ul>;
+  return <ul className="users-list">{userItemElements}</ul>;
 }
 
 export default UserList;
