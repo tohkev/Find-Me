@@ -6,36 +6,12 @@ import {
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 import Button from "../../shared/components/FormElements/Button";
+import { useForm } from "../../shared/hooks/form-hook";
 import "./PlaceForm.css";
 
 function NewPlace() {
-  function formReducer(state, action) {
-    switch (action.type) {
-      case "INPUT_CHANGE":
-        let formIsValid = true;
-        for (const inputId in state.inputs) {
-          if (inputId === action.inputId) {
-            formIsValid = formIsValid && action.isValid;
-          } else {
-            formIsValid = formIsValid && state.inputs[inputId].isValid;
-          }
-        }
-        return {
-          ...state,
-          inputs: {
-            ...state.inputs,
-            [action.inputId]: { value: action.value, isValid: action.isValid },
-          },
-          isValid: formIsValid,
-        };
-
-      default:
-        return state;
-    }
-  }
-
-  const [formState, dispatch] = React.useReducer(formReducer, {
-    inputs: {
+  const [formState, inputHandler] = useForm(
+    {
       title: {
         value: "",
         isValid: false,
@@ -49,18 +25,8 @@ function NewPlace() {
         isValid: false,
       },
     },
-    isValid: false,
-  });
-
-  //useCallback allows you to define dependencies as to when a function would run again
-  const inputHandler = React.useCallback((id, value, isValid) => {
-    dispatch({
-      type: "INPUT_CHANGE",
-      inputId: id,
-      isValid: isValid,
-      value: value,
-    });
-  }, []);
+    false
+  );
 
   //handles the form submission
   function placeSubmitHandler(event) {
