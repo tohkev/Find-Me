@@ -28,6 +28,14 @@ function Input(props) {
     isTouched: false,
   });
 
+  //used to store the input information into state
+  const { id, onInput } = props;
+  const { value, isValid } = inputState;
+
+  React.useEffect(() => {
+    onInput(id, value, isValid);
+  }, [id, value, isValid, onInput]);
+
   function changeHandler(event) {
     dispatch({
       type: "CHANGE",
