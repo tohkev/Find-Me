@@ -6,7 +6,7 @@ import {
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 import Button from "../../shared/components/FormElements/Button";
-import "./NewPlace.css";
+import "./PlaceForm.css";
 
 function NewPlace() {
   function formReducer(state, action) {
@@ -41,6 +41,10 @@ function NewPlace() {
         isValid: false,
       },
       description: {
+        value: "",
+        isValid: false,
+      },
+      address: {
         value: "",
         isValid: false,
       },
