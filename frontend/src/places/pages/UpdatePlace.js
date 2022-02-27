@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import Card from "../../shared/components/UIElements/Card";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH,
@@ -26,7 +27,7 @@ const DUMMY_PLACES = [
   },
   {
     id: "p2",
-    title: "Empire State Building",
+    title: "Emp. State Building",
     description: "One of the most famous skyscrapers in the world",
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/800px-Empire_State_Building_%28aerial_view%29.jpg",
@@ -58,19 +59,21 @@ function UpdatePlace() {
   const identifiedPlace = DUMMY_PLACES.find((place) => place.id === placeId);
 
   React.useEffect(() => {
-    setFormData(
-      {
-        title: {
-          value: identifiedPlace.title,
-          isValid: true,
+    if (identifiedPlace) {
+      setFormData(
+        {
+          title: {
+            value: identifiedPlace.title,
+            isValid: true,
+          },
+          description: {
+            value: identifiedPlace.description,
+            isValid: true,
+          },
         },
-        description: {
-          value: identifiedPlace.description,
-          isValid: true,
-        },
-      },
-      true
-    );
+        true
+      );
+    }
   }, [setFormData, identifiedPlace]);
 
   function updatePlaceSubmitHandler(event) {
@@ -81,7 +84,9 @@ function UpdatePlace() {
   if (!identifiedPlace) {
     return (
       <div className="center">
-        <h2>Could not find a place</h2>
+        <Card>
+          <h2>Could not find a place</h2>
+        </Card>
       </div>
     );
   }
