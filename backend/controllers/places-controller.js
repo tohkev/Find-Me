@@ -1,4 +1,5 @@
 const HttpError = require("../models/http-error");
+const { nanoid } = require("nanoid");
 
 const DUMMY_PLACES = [
 	{
@@ -9,19 +10,6 @@ const DUMMY_PLACES = [
 			"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/800px-Empire_State_Building_%28aerial_view%29.jpg",
 		address: "20 W 34th St, New York, NY 10001",
 		creator: "u1",
-		location: {
-			lat: 40.7484405,
-			lng: -73.9878531,
-		},
-	},
-	{
-		id: "p2",
-		title: "Statue of Liberty",
-		description: "Iconic statue in New York",
-		imageUrl:
-			"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/800px-Empire_State_Building_%28aerial_view%29.jpg",
-		address: "20 W 34th St, New York, NY 10001",
-		creator: "u2",
 		location: {
 			lat: 40.7484405,
 			lng: -73.9878531,
@@ -56,5 +44,21 @@ function getPlacesByUserId(req, res, next) {
 	res.json({ places });
 }
 
+function createPlace(req, res, next) {
+	const { title, description, coordinates, address, creator } = req.body;
+	const createdPlace = {
+		id: nanoid(),
+		title,
+		description,
+		location: coordinates,
+		address,
+		creator,
+	};
+	DUMMY_PLACES.push(createdPlace);
+
+	res.status(201).json(createdPlace);
+}
+
 exports.getPlaceById = getPlaceById;
 exports.getPlacesByUserId = getPlacesByUserId;
+exports.createPlace = createPlace;
