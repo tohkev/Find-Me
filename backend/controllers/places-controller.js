@@ -1,7 +1,7 @@
 const HttpError = require("../models/http-error");
 const { nanoid } = require("nanoid");
 
-const DUMMY_PLACES = [
+let DUMMY_PLACES = [
 	{
 		id: "p1",
 		title: "Empire State Building",
@@ -32,7 +32,7 @@ function getPlacesByUserId(req, res, next) {
 	const userId = req.params.uid;
 	const places = DUMMY_PLACES.filter((place) => place.creator === userId);
 
-	if (places.length === 0) {
+	if (!places || places.length === 0) {
 		return next(
 			new HttpError(
 				"User does not have any places or does not exist.",
@@ -59,6 +59,29 @@ function createPlace(req, res, next) {
 	res.status(201).json(createdPlace);
 }
 
+function updatePlace(req, res, next) {
+	const { title, description } = req.body;
+	const placeId = req.params.pid;
+	const updatedPlace = {
+		...DUMMY_PLACES.find((place) => place.id === placeId),
+	};
+	const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+	updatedPlace.title = title;
+	updatedPlace.description = description;
+	DUMMY_PLACES[placeIndex] = updatedPlace;
+
+	res.status(200).json({ place: updatedPlace });
+}
+
+function deletePlace(req, res, next) {
+	const placeId = req.params.pid;
+	DUMMY_PLACES = DUMMY_PLACES.filter((place) => place.id !== placeId);
+
+	res.status(200).json({ message: "Deleted place." });
+}
+
 exports.getPlaceById = getPlaceById;
 exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
+exports.updatePlace = updatePlace;
+exports.deletePlace = deletePlace;
