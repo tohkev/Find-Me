@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
 const { nanoid } = require("nanoid");
+const { validationResult } = require("express-validator");
 
 let DUMMY_PLACES = [
 	{
@@ -45,6 +46,16 @@ function getPlacesByUserId(req, res, next) {
 }
 
 function createPlace(req, res, next) {
+	//validiationResult checks the req to see if there are any validation errors
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		const errorMessage = errors.errors.map(
+			(error) => `${error.param} ${error.msg}`
+		);
+		return next(new HttpError(errorMessage, 422));
+	}
+
 	const { title, description, coordinates, address, creator } = req.body;
 	const createdPlace = {
 		id: nanoid(),
@@ -60,6 +71,14 @@ function createPlace(req, res, next) {
 }
 
 function updatePlace(req, res, next) {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		const errorMessage = errors.errors.map(
+			(error) => `${error.param} ${error.msg}`
+		);
+		return next(new HttpError(errorMessage, 422));
+	}
+
 	const { title, description } = req.body;
 	const placeId = req.params.pid;
 	const updatedPlace = {
@@ -75,6 +94,10 @@ function updatePlace(req, res, next) {
 
 function deletePlace(req, res, next) {
 	const placeId = req.params.pid;
+	if (!DUMMY_PLACES.find((place) => place.id === placeId)) {
+		return next(new HttpError("Could not find a place with that ID"));
+	}
+
 	DUMMY_PLACES = DUMMY_PLACES.filter((place) => place.id !== placeId);
 
 	res.status(200).json({ message: "Deleted place." });

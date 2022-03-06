@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
 const { nanoid } = require("nanoid");
+const { validationResult } = require("express-validator");
 
 const DUMMY_USERS = [
 	{
@@ -25,6 +26,14 @@ function getUsers(req, res, next) {
 }
 
 function signup(req, res, next) {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		const errorMessage = errors.errors.map(
+			(error) => `${error.param} ${error.msg}`
+		);
+		return next(new HttpError(errorMessage, 422));
+	}
+
 	const { name, password, email } = req.body;
 
 	const existingEmail = DUMMY_USERS.find((user) => user.email === email);
