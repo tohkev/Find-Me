@@ -22,7 +22,4 @@ async function getCoordsFromAddress(address) {
 	return coordinates;
 }
 
-const address = "307 5th Ave, New York, NY 10016";
-console.log(encodeURIComponent(address));
-
 module.exports = getCoordsFromAddress;
