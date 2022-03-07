@@ -1,7 +1,9 @@
 const HttpError = require("../models/http-error");
 const { nanoid } = require("nanoid");
 const { validationResult } = require("express-validator");
+
 const getCoordsFromAddress = require("../util/location");
+const Place = require("../models/place");
 
 let DUMMY_PLACES = [
 	{
@@ -67,15 +69,24 @@ async function createPlace(req, res, next) {
 		return next(error);
 	}
 
-	const createdPlace = {
-		id: nanoid(),
+	const createdPlace = new Place({
 		title,
 		description,
-		location: coordinates,
 		address,
+		location: coordinates,
+		image: "https://media.istockphoto.com/photos/silhouette-of-person-in-the-airport-picture-id494216846?k=20&m=494216846&s=612x612&w=0&h=H8NFCE0oAAe2gDU06mNiRIcQxHRNuDd8ooxvEWrEzm0=",
 		creator,
-	};
-	DUMMY_PLACES.push(createdPlace);
+	});
+
+	try {
+		await createdPlace.save();
+	} catch (err) {
+		const error = new HttpError(
+			"Failed to add place, please try again.",
+			500
+		);
+		return next(error);
+	}
 
 	res.status(201).json(createdPlace);
 }
