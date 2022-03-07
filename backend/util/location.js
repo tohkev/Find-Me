@@ -1,8 +1,10 @@
 const axios = require("axios");
 
 const HttpError = require("../models/http-error");
+const config = require("./config");
 
-const API_KEY = "YOUR API KEY HERE";
+//YOUR API KEY HERE
+const API_KEY = config.mapQuestKey;
 
 async function getCoordsFromAddress(address) {
 	const response = await axios.get(
