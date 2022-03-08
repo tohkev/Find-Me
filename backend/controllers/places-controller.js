@@ -21,20 +21,42 @@ let DUMMY_PLACES = [
 	},
 ];
 
-function getPlaceById(req, res, next) {
+async function getPlaceById(req, res, next) {
 	const placeId = req.params.pid;
-	const place = DUMMY_PLACES.find((place) => placeId === place.id);
+
+	let place;
+	try {
+		place = await Place.findById(placeId);
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with retrieving place, please try again.",
+			500
+		);
+		return next(error);
+	}
+
 	if (!place) {
 		//if used in a synchronous operation, you can throw instead of next
 		return next(new HttpError("Could not find a place with that ID", 404));
 	}
 
-	res.json({ place });
+	//setting getters to true allows us to get the ID property provided by mongo
+	res.json({ place: place.toObject({ getters: true }) });
 }
 
-function getPlacesByUserId(req, res, next) {
+async function getPlacesByUserId(req, res, next) {
 	const userId = req.params.uid;
-	const places = DUMMY_PLACES.filter((place) => place.creator === userId);
+
+	let places;
+	try {
+		places = await Place.find({ creator: userId });
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with getting user places, please try again.",
+			500
+		);
+		return next(error);
+	}
 
 	if (!places || places.length === 0) {
 		return next(
@@ -45,7 +67,9 @@ function getPlacesByUserId(req, res, next) {
 		);
 	}
 
-	res.json({ places });
+	res.json({
+		places: places.map((place) => place.toObject({ getters: true })),
+	});
 }
 
 async function createPlace(req, res, next) {
@@ -91,7 +115,7 @@ async function createPlace(req, res, next) {
 	res.status(201).json(createdPlace);
 }
 
-function updatePlace(req, res, next) {
+async function updatePlace(req, res, next) {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		const errorMessage = errors.errors.map(
@@ -102,24 +126,39 @@ function updatePlace(req, res, next) {
 
 	const { title, description } = req.body;
 	const placeId = req.params.pid;
-	const updatedPlace = {
-		...DUMMY_PLACES.find((place) => place.id === placeId),
-	};
-	const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
-	updatedPlace.title = title;
-	updatedPlace.description = description;
-	DUMMY_PLACES[placeIndex] = updatedPlace;
 
-	res.status(200).json({ place: updatedPlace });
-}
+	const filter = { id: placeId };
+	const updateProp = { title: title, description: description };
+	let updatedPlace;
 
-function deletePlace(req, res, next) {
-	const placeId = req.params.pid;
-	if (!DUMMY_PLACES.find((place) => place.id === placeId)) {
-		return next(new HttpError("Could not find a place with that ID"));
+	try {
+		updatedPlace = await Place.findOneAndUpdate(filter, updateProp, {
+			new: true,
+		});
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with updating place, please try again.",
+			500
+		);
+		return next(error);
 	}
 
-	DUMMY_PLACES = DUMMY_PLACES.filter((place) => place.id !== placeId);
+	res.status(200).json({ place: updatedPlace.toObject({ getters: true }) });
+}
+
+async function deletePlace(req, res, next) {
+	const placeId = req.params.pid;
+
+	let place;
+	try {
+		place = await Place.findByIdAndDelete(placeId);
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with deleting place, please try again",
+			500
+		);
+		return next(error);
+	}
 
 	res.status(200).json({ message: "Deleted place." });
 }
