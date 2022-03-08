@@ -7,6 +7,7 @@ Technology Used:
     -   React Routing DOM
     -   Hooks (useState, useReducer, useEffect, useRef, useCallback, useContext)
 -   MongoDB
--   Express
 -   Node.js
+    -   Express
+        -   Express Validator
 -   Map from OpenLayers API
