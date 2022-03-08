@@ -1,6 +1,7 @@
 const HttpError = require("../models/http-error");
 const { nanoid } = require("nanoid");
 const { validationResult } = require("express-validator");
+const User = require("../models/user");
 
 const DUMMY_USERS = [
 	{
@@ -17,15 +18,28 @@ const DUMMY_USERS = [
 	},
 ];
 
-function getUsers(req, res, next) {
-	if (!DUMMY_USERS || DUMMY_USERS.length === 0) {
-		return next(new HttpError("No users found.", 404));
+async function getUsers(req, res, next) {
+	let users;
+
+	try {
+		users = await User.find({}, "-password");
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with fetching users, please try again.",
+			500
+		);
+		return next(error);
 	}
 
-	res.json({ users: DUMMY_USERS });
+	if (!users || users.length === 0) {
+		const error = new HttpError("No users found", 404);
+		next(error);
+	}
+
+	res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 }
 
-function signup(req, res, next) {
+async function signup(req, res, next) {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		const errorMessage = errors.errors.map(
@@ -34,33 +48,67 @@ function signup(req, res, next) {
 		return next(new HttpError(errorMessage, 422));
 	}
 
-	const { name, password, email } = req.body;
+	const { name, password, email, places } = req.body;
 
-	const existingEmail = DUMMY_USERS.find((user) => user.email === email);
+	let existingEmail;
 
-	if (existingEmail) {
-		return next(
-			new HttpError("Could not create user, email already exists", 422)
+	try {
+		existingEmail = await User.findOne({ email: email });
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with verifying email, please try again.",
+			500
 		);
+		return next(error);
 	}
 
-	const newUser = {
-		id: nanoid(),
+	if (existingEmail) {
+		const error = new HttpError(
+			"User already exists, please login instead.",
+			422
+		);
+		return next(error);
+	}
+
+	const newUser = new User({
 		name,
 		password,
 		email,
-	};
-	DUMMY_USERS.push(newUser);
+		image: "https://i.stack.imgur.com/34AD2.jpg",
+		places,
+	});
 
-	res.status(201).json({ user: newUser });
+	try {
+		await newUser.save();
+	} catch (err) {
+		const error = new HttpError("Sign up failed, please try again.", 500);
+		return next(error);
+	}
+
+	res.status(201).json({ user: newUser.toObject({ getters: true }) });
 }
 
-function login(req, res, next) {
+async function login(req, res, next) {
 	const { email, password } = req.body;
-	const foundUser = DUMMY_USERS.find((user) => user.email === email);
+
+	let foundUser;
+
+	try {
+		foundUser = await User.findOne({ email: email });
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with logging in, please try again.",
+			500
+		);
+		return next(error);
+	}
+
 	if (!foundUser || foundUser.password !== password) {
 		return next(
-			new HttpError("Could not identify user with those credentials")
+			new HttpError(
+				"Could not identify user with those credentials.",
+				401
+			)
 		);
 	}
 
