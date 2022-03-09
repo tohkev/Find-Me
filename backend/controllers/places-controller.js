@@ -22,7 +22,6 @@ async function getPlaceById(req, res, next) {
 	}
 
 	if (!place) {
-		//if used in a synchronous operation, you can throw instead of next
 		return next(new HttpError("Could not find a place with that ID", 404));
 	}
 

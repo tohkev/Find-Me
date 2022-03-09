@@ -1,5 +1,4 @@
 const HttpError = require("../models/http-error");
-const { nanoid } = require("nanoid");
 const { validationResult } = require("express-validator");
 const User = require("../models/user");
 
