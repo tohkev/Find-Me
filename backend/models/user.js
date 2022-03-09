@@ -22,7 +22,7 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 	},
-	places: { type: String, required: true },
+	places: [{ type: mongoose.Types.ObjectId, require: true, ref: "Place" }],
 });
 
 userSchema.plugin(uniqueValidator);

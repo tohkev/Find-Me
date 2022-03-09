@@ -3,21 +3,6 @@ const { nanoid } = require("nanoid");
 const { validationResult } = require("express-validator");
 const User = require("../models/user");
 
-const DUMMY_USERS = [
-	{
-		id: "u1",
-		name: "Kevin To",
-		password: "wowowowyeyeyey",
-		email: "bigtoh@email.com",
-	},
-	{
-		id: "u2",
-		name: "Ann Jo",
-		password: "supersafe",
-		email: "macanncheez@mail.com",
-	},
-];
-
 async function getUsers(req, res, next) {
 	let users;
 
@@ -48,7 +33,7 @@ async function signup(req, res, next) {
 		return next(new HttpError(errorMessage, 422));
 	}
 
-	const { name, password, email, places } = req.body;
+	const { name, password, email } = req.body;
 
 	let existingEmail;
 
@@ -75,7 +60,7 @@ async function signup(req, res, next) {
 		password,
 		email,
 		image: "https://i.stack.imgur.com/34AD2.jpg",
-		places,
+		places: [],
 	});
 
 	try {
