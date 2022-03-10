@@ -12,6 +12,20 @@ const app = express();
 //this will parse incoming request body and extract JSON data to convert to JS
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+	//allows any domain to send requests
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	//Controls what headers may be used within the frontend
+	res.setHeader(
+		"Access-Control-Allow-Headers",
+		"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+	);
+	//controls which HTTP methods may be used within the frontend
+	res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+
+	next();
+});
+
 //filters to only paths that have /api/places
 app.use("/api/places", placesRoutes);
 
