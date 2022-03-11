@@ -7,15 +7,7 @@ function Users() {
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [error, setError] = React.useState();
 	const [loadedUsers, setLoadedUsers] = React.useState([]);
-	// const USERS = [
-	//   {
-	//     id: "u1",
-	//     image:
-	//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWpTm8D5Fdn0pulF4M6JcfL-QLu_aGDEtaMA&usqp=CAU",
-	//     name: "Kevin Toh",
-	//     places: 5,
-	//   },
-	// ];
+
 	React.useEffect(() => {
 		setIsLoading(true);
 
