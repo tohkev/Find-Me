@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "../../shared/hooks/form-hook";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -18,8 +19,7 @@ import "./Auth.css";
 function Auth() {
 	const auth = React.useContext(AuthContext);
 	const [isLoginMode, setIsLoginMode] = React.useState(true);
-	const [isLoading, setIsLoading] = React.useState(false);
-	const [error, setError] = React.useState(null);
+	const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
 	const [formState, inputHandler, setFormData] = useForm(
 		{
@@ -37,66 +37,43 @@ function Auth() {
 
 	async function authSubmitHandler(event) {
 		event.preventDefault();
-		setIsLoading(true);
 
 		if (isLoginMode) {
 			try {
-				const response = await fetch(
+				await sendRequest(
 					"http://localhost:5000/api/users/login",
+					"POST",
 					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({
-							email: formState.inputs.email.value,
-							password: formState.inputs.password.value,
-						}),
-					}
+						"Content-Type": "application/json",
+					},
+					JSON.stringify({
+						email: formState.inputs.email.value,
+						password: formState.inputs.password.value,
+					})
 				);
-				//returns a promise which is parsed in JSON
-				const responseData = await response.json();
-				if (!response.ok) {
-					throw new Error(responseData.message);
-				}
-				setIsLoading(false);
 				auth.login();
 			} catch (err) {
+				//would not need to do anything in this block because the http hook will throw an error
+				// and login will not occur if there is an error
 				console.log(err);
-				setIsLoading(false);
-				setError(
-					err.message || "Something went wrong, please try again."
-				);
 			}
 		} else {
 			try {
-				const response = await fetch(
+				await sendRequest(
 					"http://localhost:5000/api/users/signup",
+					"POST",
 					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({
-							name: formState.inputs.name.value,
-							email: formState.inputs.email.value,
-							password: formState.inputs.password.value,
-						}),
-					}
+						"Content-Type": "application/json",
+					},
+					JSON.stringify({
+						name: formState.inputs.name.value,
+						email: formState.inputs.email.value,
+						password: formState.inputs.password.value,
+					})
 				);
-				//returns a promise which is parsed in JSON
-				const responseData = await response.json();
-				if (!response.ok) {
-					throw new Error(responseData.message);
-				}
-				setIsLoading(false);
 				auth.login();
 			} catch (err) {
 				console.log(err);
-				setIsLoading(false);
-				setError(
-					err.message || "Something went wrong, please try again."
-				);
 			}
 		}
 	}
@@ -126,13 +103,9 @@ function Auth() {
 		setIsLoginMode((prevMode) => !prevMode);
 	}
 
-	function errorHandler() {
-		setError(null);
-	}
-
 	return (
 		<React.Fragment>
-			<ErrorModal onClear={errorHandler} error={error} />
+			<ErrorModal onClear={clearError} error={error} />
 			<Card className="authentication">
 				{isLoading && <LoadingSpinner asOverlay />}
 				<h2>{isLoginMode ? "Log In" : "Sign Up"} to continue</h2>
@@ -184,6 +157,3 @@ function Auth() {
 }
 
 export default Auth;
-
-//create an authentication (login) page
-//using the useForm hook we created, create a form with an email and password that will be validated
