@@ -9,8 +9,8 @@ export function useHttpClient() {
 	const sendRequest = React.useCallback(async function (
 		url,
 		method = "GET",
-		body = null,
-		headers = {}
+		headers = {},
+		body = null
 	) {
 		setIsLoading(true);
 		//before a request is put in, we will keep track of each request and have an abort controller
