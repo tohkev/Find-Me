@@ -113,14 +113,14 @@ async function createPlace(req, res, next) {
 	try {
 		//using transactions and sessions to execute code that will be reversed if there is an error along the way
 		//changes are save when committed
-		const session = await mongoose.startSession();
-		session.startTransaction();
+		const sess = await mongoose.startSession();
+		sess.startTransaction();
 		//creates a place into our database
-		await createdPlace.save({ session: session });
+		await createdPlace.save({ session: sess });
 		//adds the id of the created place into the user place array using Mongoose's push function
 		user.places.push(createdPlace);
-		await user.save({ session: session });
-		await session.commitTransaction();
+		await user.save({ session: sess });
+		await sess.commitTransaction();
 	} catch (err) {
 		const error = new HttpError(
 			"Failed to add place, please try again.",
