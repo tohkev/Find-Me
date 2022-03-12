@@ -40,7 +40,7 @@ function Auth() {
 
 		if (isLoginMode) {
 			try {
-				await sendRequest(
+				const responseData = await sendRequest(
 					"http://localhost:5000/api/users/login",
 					"POST",
 					{
@@ -51,7 +51,7 @@ function Auth() {
 						password: formState.inputs.password.value,
 					})
 				);
-				auth.login();
+				auth.login(responseData.user.id);
 			} catch (err) {
 				//would not need to do anything in this block because the http hook will throw an error
 				// and login will not occur if there is an error
@@ -59,7 +59,7 @@ function Auth() {
 			}
 		} else {
 			try {
-				await sendRequest(
+				const responseData = await sendRequest(
 					"http://localhost:5000/api/users/signup",
 					"POST",
 					{
@@ -71,7 +71,7 @@ function Auth() {
 						password: formState.inputs.password.value,
 					})
 				);
-				auth.login();
+				auth.login(responseData.user.id);
 			} catch (err) {
 				console.log(err);
 			}

@@ -19,13 +19,16 @@ import { AuthContext } from "./shared/context/auth-context";
 
 function App() {
 	const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+	const [userId, setUserId] = React.useState(false);
 
-	const login = React.useCallback(() => {
+	const login = React.useCallback((uid) => {
 		setIsLoggedIn(true);
+		setUserId(uid);
 	}, []);
 
 	const logout = React.useCallback(() => {
 		setIsLoggedIn(false);
+		setUserId(null);
 	}, []);
 
 	let routes;
@@ -67,7 +70,12 @@ function App() {
 
 	return (
 		<AuthContext.Provider
-			value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
+			value={{
+				isLoggedIn: isLoggedIn,
+				userId: userId,
+				login: login,
+				logout: logout,
+			}}
 		>
 			<Router>
 				<MainNavigation />
