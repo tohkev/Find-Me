@@ -14,6 +14,12 @@ function UserPlaces() {
 	const [loadedPlaces, setLoadedPlaces] = React.useState([]);
 	const userId = useParams().userId;
 
+	function placeDeleteHandler(placeId) {
+		setLoadedPlaces((prevPlaces) =>
+			prevPlaces.filter((place) => place.id !== placeId)
+		);
+	}
+
 	React.useEffect(() => {
 		async function getUserPlaces() {
 			try {
@@ -34,7 +40,9 @@ function UserPlaces() {
 					<LoadingSpinner />
 				</div>
 			)}
-			{!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} />}
+			{!isLoading && loadedPlaces && (
+				<PlaceList items={loadedPlaces} onDelete={placeDeleteHandler} />
+			)}
 		</React.Fragment>
 	);
 }
