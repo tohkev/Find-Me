@@ -12,9 +12,11 @@ import { useForm } from "../../shared/hooks/form-hook";
 import { useHttpClient } from "../../shared/hooks/http-hook";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { AuthContext } from "../../shared/context/auth-context";
 import "./PlaceForm.css";
 
 function UpdatePlace() {
+	const auth = React.useContext(AuthContext);
 	const [identifiedPlace, setIdentifiedPlace] = React.useState();
 	const { isLoading, error, sendRequest, clearError } = useHttpClient();
 	const history = useHistory();
@@ -42,28 +44,33 @@ function UpdatePlace() {
 					`http://localhost:5000/api/places/${placeId}`
 				);
 				setIdentifiedPlace(responseData.place);
+				setFormData(
+					{
+						title: {
+							value: identifiedPlace.title,
+							isValid: true,
+						},
+						description: {
+							value: identifiedPlace.description,
+							isValid: true,
+						},
+					},
+					true
+				);
 			} catch (err) {}
 		}
 		getPlace();
-	}, [sendRequest, placeId]);
+	}, [sendRequest, placeId, setFormData]);
 
-	React.useEffect(() => {
-		if (identifiedPlace) {
-			setFormData(
-				{
-					title: {
-						value: identifiedPlace.title,
-						isValid: true,
-					},
-					description: {
-						value: identifiedPlace.description,
-						isValid: true,
-					},
-				},
-				true
-			);
-		}
-	}, [setFormData, identifiedPlace]);
+	if (isLoading) {
+		return (
+			<div className="center">
+				<h2>
+					<LoadingSpinner />
+				</h2>
+			</div>
+		);
+	}
 
 	async function updatePlaceSubmitHandler(event) {
 		event.preventDefault();
@@ -79,9 +86,8 @@ function UpdatePlace() {
 					description: formState.inputs.description.value,
 				})
 			);
+			history.push(`/${auth.userId}/places`);
 		} catch (err) {}
-		console.log(formState.inputs);
-		history.push("/");
 	}
 
 	if (!identifiedPlace && !isLoading) {
@@ -94,15 +100,18 @@ function UpdatePlace() {
 		);
 	}
 
+	if (isLoading) {
+		return (
+			<div className="center">
+				<LoadingSpinner />
+			</div>
+		);
+	}
+
 	return (
 		<React.Fragment>
 			{error && <ErrorModal error={error} onClear={clearError} />}
-			{isLoading && (
-				<div className="center">
-					<LoadingSpinner />
-				</div>
-			)}
-			{!isLoading && formState.inputs.title.value && (
+			{!isLoading && identifiedPlace && (
 				<form
 					className="place-form"
 					onSubmit={updatePlaceSubmitHandler}
@@ -114,9 +123,9 @@ function UpdatePlace() {
 						label="Title"
 						validators={[VALIDATOR_REQUIRE()]}
 						errorText="Please enter a valid title."
-						initialValue={formState.inputs.title.value}
 						onInput={inputHandler}
-						initialValid={formState.inputs.title.isValid}
+						initialValue={identifiedPlace.title}
+						initialValid={true}
 					/>
 					<Input
 						id="description"
@@ -124,9 +133,9 @@ function UpdatePlace() {
 						label="Description"
 						validators={[VALIDATOR_MINLENGTH(5)]}
 						errorText="Please enter a valid description (at least 5 characters)."
-						initialValue={formState.inputs.description.value}
 						onInput={inputHandler}
-						initialValid={formState.inputs.description.isValid}
+						initialValue={identifiedPlace.description}
+						initialValid={true}
 					/>
 					<Button type="submit" disabled={!formState.isValid}>
 						UPDATE PLACE
