@@ -136,8 +136,8 @@ function Auth() {
 						element="input"
 						type="password"
 						label="Password"
-						validators={[VALIDATOR_MINLENGTH(5)]}
-						errorText="Please enter a valid password."
+						validators={[VALIDATOR_MINLENGTH(9)]}
+						errorText="Please enter a valid password (at least 9 characters)."
 						onInput={inputHandler}
 					/>
 					<Button
