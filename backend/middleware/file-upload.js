@@ -13,6 +13,7 @@ const fileUpload = multer({
 	//how the data is stored on the multer disk storage driver
 	storage: multer.diskStorage({
 		destination: (req, file, callback) => {
+			//this will save the image into a folder uploads/images
 			callback(null, "uploads/images");
 		},
 		filename: (req, file, callback) => {
