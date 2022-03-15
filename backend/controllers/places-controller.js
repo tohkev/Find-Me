@@ -85,7 +85,7 @@ async function createPlace(req, res, next) {
 		description,
 		address,
 		location: coordinates,
-		image: "https://media.istockphoto.com/photos/silhouette-of-person-in-the-airport-picture-id494216846?k=20&m=494216846&s=612x612&w=0&h=H8NFCE0oAAe2gDU06mNiRIcQxHRNuDd8ooxvEWrEzm0=",
+		image: req.file.path,
 		creator,
 	});
 

@@ -2,6 +2,7 @@ const express = require("express");
 const { check } = require("express-validator");
 
 const placesControllers = require("../controllers/places-controller");
+const fileUpload = require("../middleware/file-upload");
 
 const router = express.Router();
 
@@ -12,6 +13,7 @@ router.get("/user/:uid", placesControllers.getPlacesByUserId);
 //check is a middleware that validates if a field meets certain conditions (title is not empty or description meets minimum length in this case)
 router.post(
 	"/",
+	fileUpload.single("image"),
 	[
 		check("title").not().isEmpty().withMessage("must not be empty"),
 		check("description")
