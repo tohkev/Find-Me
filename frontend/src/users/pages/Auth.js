@@ -39,7 +39,6 @@ function Auth() {
 	async function authSubmitHandler(event) {
 		event.preventDefault();
 
-		console.log(formState.inputs);
 		if (isLoginMode) {
 			try {
 				const responseData = await sendRequest(
@@ -61,17 +60,18 @@ function Auth() {
 			}
 		} else {
 			try {
+				//formData is used to store data that JSON cannot (images)
+				const formData = new FormData();
+				formData.append("email", formState.inputs.email.value);
+				formData.append("name", formState.inputs.name.value);
+				formData.append("password", formState.inputs.password.value);
+				formData.append("image", formState.inputs.image.value);
 				const responseData = await sendRequest(
 					"http://localhost:5000/api/users/signup",
 					"POST",
-					{
-						"Content-Type": "application/json",
-					},
-					JSON.stringify({
-						name: formState.inputs.name.value,
-						email: formState.inputs.email.value,
-						password: formState.inputs.password.value,
-					})
+					{},
+					//formData automatically sets the headers
+					formData
 				);
 				auth.login(responseData.user.id);
 			} catch (err) {
