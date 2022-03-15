@@ -1,5 +1,5 @@
 const multer = require("multer");
-const nanoid = require("nanoid");
+const { nanoid } = require("nanoid");
 
 const MIME_TYPE_MAP = {
 	"image/png": "png",
@@ -13,7 +13,7 @@ const fileUpload = multer({
 	//how the data is stored on the multer disk storage driver
 	storage: multer.diskStorage({
 		destination: (req, file, callback) => {
-			cb(null, "uploads/images");
+			callback(null, "uploads/images");
 		},
 		filename: (req, file, callback) => {
 			const extension = MIME_TYPE_MAP[file.mimetype];
