@@ -58,7 +58,7 @@ async function signup(req, res, next) {
 		name,
 		password,
 		email,
-		image: "https://i.stack.imgur.com/34AD2.jpg",
+		image: req.file.path,
 		places: [],
 	});
 
