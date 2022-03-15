@@ -6,6 +6,8 @@ import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
+
 import {
 	VALIDATOR_MINLENGTH,
 	VALIDATOR_REQUIRE,
@@ -32,6 +34,10 @@ function NewPlace() {
 				value: "",
 				isValid: false,
 			},
+			image: {
+				value: null,
+				isValid: false,
+			},
 		},
 		false
 	);
@@ -40,18 +46,19 @@ function NewPlace() {
 	async function placeSubmitHandler(event) {
 		event.preventDefault();
 		try {
+			const formData = new FormData();
+			formData.append("title", formState.inputs.title.value);
+			formData.append("description", formState.inputs.description.value);
+			formData.append("address", formState.inputs.address.value);
+			formData.append("creator", auth.userId);
+			formData.append("image", formState.inputs.image.value);
+
 			await sendRequest(
 				"http://localhost:5000/api/places",
 				"POST",
-				{
-					"Content-Type": "application/json",
-				},
-				JSON.stringify({
-					title: formState.inputs.title.value,
-					description: formState.inputs.description.value,
-					address: formState.inputs.address.value,
-					creator: auth.userId,
-				})
+				//no headers needed as FormData automatically sends the needed headers
+				{},
+				formData
 			);
 			//After submission of a new place, the use will be redirected to /
 			history.push("/");
@@ -90,6 +97,11 @@ function NewPlace() {
 					validators={[VALIDATOR_REQUIRE()]}
 					errorText="Please enter a valid address."
 					onInput={inputHandler}
+				/>
+				<ImageUpload
+					id="image"
+					onInput={inputHandler}
+					errorText="Please provide an image for your location."
 				/>
 				<Button type="submit" disabled={!formState.isValid}>
 					ADD PLACE
