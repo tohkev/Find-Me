@@ -1,8 +1,10 @@
+const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const HttpError = require("../models/http-error");
-const { validationResult } = require("express-validator");
 const User = require("../models/user");
+const config = require("../util/config");
 
 async function getUsers(req, res, next) {
 	let users;
@@ -83,7 +85,24 @@ async function signup(req, res, next) {
 		return next(error);
 	}
 
-	res.status(201).json({ user: newUser.toObject({ getters: true }) });
+	//using jwt to generate a token using the createdUser's getter (id)
+	let token;
+	try {
+		token = jwt.sign(
+			{ userId: newUser.id, email: createdUser.email },
+			config.privateKey,
+			{ expiresIn: "1h" }
+		);
+	} catch (err) {
+		const error = new HttpError("Issue with token, please try again.", 500);
+		return next(error);
+	}
+
+	res.status(201).json({
+		user: createdUser.id,
+		email: createdUser.email,
+		token: token,
+	});
 }
 
 async function login(req, res, next) {
@@ -127,9 +146,22 @@ async function login(req, res, next) {
 		return next(error);
 	}
 
+	let token;
+	try {
+		token = await jwt.sign(
+			{ userId: foundUser.id, email: foundUser.email },
+			config.privateKey,
+			{ expiredIn: "1hr" }
+		);
+	} catch (err) {
+		const error = new HttpError("Issue with token, please try again.", 500);
+		return next(error);
+	}
+
 	res.json({
-		message: "Logged in!",
-		user: foundUser.toObject({ getters: true }),
+		userId: foundUser.id,
+		email: foundUser.email,
+		token: token,
 	});
 }
 
