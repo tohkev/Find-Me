@@ -2,6 +2,7 @@ const HttpError = require("../models/http-error");
 const { nanoid } = require("nanoid");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+const fs = require("fs");
 
 const getCoordsFromAddress = require("../util/location");
 const Place = require("../models/place");
@@ -183,6 +184,8 @@ async function deletePlace(req, res, next) {
 		return next(error);
 	}
 
+	const imagePath = place.image;
+
 	try {
 		const session = await mongoose.startSession();
 		session.startTransaction();
@@ -199,6 +202,10 @@ async function deletePlace(req, res, next) {
 		);
 		return next(error);
 	}
+
+	fs.unlink(imagePath, (err) => {
+		console.log(err);
+	});
 
 	res.status(200).json({ message: "Deleted place." });
 }
