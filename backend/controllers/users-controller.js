@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
 const User = require("../models/user");
@@ -54,9 +56,21 @@ async function signup(req, res, next) {
 		return next(error);
 	}
 
+	//utilizing bcryptjs to hash the password provided by the user
+	let hashedPassword;
+	try {
+		hashedPassword = await bcrypt.hash(password, 12);
+	} catch (err) {
+		const error = new HttpError(
+			"Issue with data processing, please try again.",
+			500
+		);
+		return next(error);
+	}
+
 	const newUser = new User({
 		name,
-		password,
+		password: hashedPassword,
 		email,
 		image: req.file.path,
 		places: [],
@@ -87,13 +101,30 @@ async function login(req, res, next) {
 		return next(error);
 	}
 
-	if (!foundUser || foundUser.password !== password) {
+	if (!foundUser) {
 		return next(
 			new HttpError(
 				"Could not identify user with those credentials.",
 				401
 			)
 		);
+	}
+
+	//using bcrypt to compare the plain text password to the hashed password for the found user
+	let isValidPassword = false;
+	try {
+		isValidPassword = await bcrypt.compare(password, existingUser.password);
+	} catch (err) {
+		const error = new HttpError("Issue with comparing data.", 500);
+		return next(error);
+	}
+
+	if (!isValidPassword) {
+		const error = new HttpError(
+			"Could not identify user with those credentials.",
+			401
+		);
+		return next(error);
 	}
 
 	res.json({
