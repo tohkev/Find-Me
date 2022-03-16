@@ -3,12 +3,16 @@ const { check } = require("express-validator");
 
 const placesControllers = require("../controllers/places-controller");
 const fileUpload = require("../middleware/file-upload");
+const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 
 router.get("/:pid", placesControllers.getPlaceById);
 
 router.get("/user/:uid", placesControllers.getPlacesByUserId);
+
+//requests sent to the routes below require a middleware to verify token
+router.use(checkAuth);
 
 //check is a middleware that validates if a field meets certain conditions (title is not empty or description meets minimum length in this case)
 router.post(

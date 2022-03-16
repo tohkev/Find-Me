@@ -89,7 +89,7 @@ async function signup(req, res, next) {
 	let token;
 	try {
 		token = jwt.sign(
-			{ userId: newUser.id, email: createdUser.email },
+			{ userId: newUser.id, email: newUser.email },
 			config.privateKey,
 			{ expiresIn: "1h" }
 		);
@@ -99,8 +99,8 @@ async function signup(req, res, next) {
 	}
 
 	res.status(201).json({
-		user: createdUser.id,
-		email: createdUser.email,
+		user: newUser.id,
+		email: newUser.email,
 		token: token,
 	});
 }
