@@ -132,7 +132,7 @@ async function login(req, res, next) {
 	//using bcrypt to compare the plain text password to the hashed password for the found user
 	let isValidPassword = false;
 	try {
-		isValidPassword = await bcrypt.compare(password, existingUser.password);
+		isValidPassword = await bcrypt.compare(password, foundUser.password);
 	} catch (err) {
 		const error = new HttpError("Issue with comparing data.", 500);
 		return next(error);
@@ -148,10 +148,10 @@ async function login(req, res, next) {
 
 	let token;
 	try {
-		token = await jwt.sign(
+		token = jwt.sign(
 			{ userId: foundUser.id, email: foundUser.email },
 			config.privateKey,
-			{ expiredIn: "1hr" }
+			{ expiresIn: "1h" }
 		);
 	} catch (err) {
 		const error = new HttpError("Issue with token, please try again.", 500);
