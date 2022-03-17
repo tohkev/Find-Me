@@ -52,7 +52,7 @@ function Auth() {
 						password: formState.inputs.password.value,
 					})
 				);
-				auth.login(responseData.user.id);
+				auth.login(responseData.userId);
 			} catch (err) {
 				//would not need to do anything in this block because the http hook will throw an error
 				// and login will not occur if there is an error
@@ -73,7 +73,7 @@ function Auth() {
 					//formData automatically sets the headers
 					formData
 				);
-				auth.login(responseData.user.id);
+				auth.login(responseData.userId);
 			} catch (err) {
 				console.log(err);
 			}
