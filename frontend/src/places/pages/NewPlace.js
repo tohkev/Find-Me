@@ -57,7 +57,7 @@ function NewPlace() {
 				"http://localhost:5000/api/places",
 				"POST",
 				//no headers needed as FormData automatically sends the needed headers
-				{},
+				{ Authorization: `Bearer ${auth.token}` },
 				formData
 			);
 			//After submission of a new place, the use will be redirected to /

@@ -18,22 +18,22 @@ import Auth from "./users/pages/Auth";
 import { AuthContext } from "./shared/context/auth-context";
 
 function App() {
-	const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+	const [token, setToken] = React.useState(false);
 	const [userId, setUserId] = React.useState(false);
 
-	const login = React.useCallback((uid) => {
-		setIsLoggedIn(true);
+	const login = React.useCallback((uid, token) => {
+		setToken(token);
 		setUserId(uid);
 	}, []);
 
 	const logout = React.useCallback(() => {
-		setIsLoggedIn(false);
+		setToken(null);
 		setUserId(null);
 	}, []);
 
 	let routes;
 
-	if (isLoggedIn) {
+	if (token) {
 		routes = (
 			<Switch>
 				<Route path="/" exact={true}>
@@ -71,7 +71,8 @@ function App() {
 	return (
 		<AuthContext.Provider
 			value={{
-				isLoggedIn: isLoggedIn,
+				isLoggedIn: !!token,
+				token: token,
 				userId: userId,
 				login: login,
 				logout: logout,
