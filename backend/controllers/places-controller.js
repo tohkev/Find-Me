@@ -140,17 +140,26 @@ async function updatePlace(req, res, next) {
 	const { title, description } = req.body;
 	const placeId = req.params.pid;
 
-	const filter = { id: placeId };
-	const updateProp = { title: title, description: description };
 	let updatedPlace;
 
 	try {
-		updatedPlace = await Place.findOneAndUpdate(filter, updateProp, {
-			new: true,
-		});
+		updatedPlace = await Place.findById(placeId);
 	} catch (err) {
 		const error = new HttpError(
 			"Issue with updating place, please try again.",
+			500
+		);
+		return next(error);
+	}
+
+	updatedPlace.title = title;
+	updatedPlace.description = description;
+
+	try {
+		await updatedPlace.save();
+	} catch (err) {
+		const error = new HttpError(
+			"Something went wrong, could not update place",
 			500
 		);
 		return next(error);
