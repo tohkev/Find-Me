@@ -99,7 +99,7 @@ async function signup(req, res, next) {
 	}
 
 	res.status(201).json({
-		user: newUser.id,
+		userId: newUser.id,
 		email: newUser.email,
 		token: token,
 	});

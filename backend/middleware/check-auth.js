@@ -4,6 +4,11 @@ const HttpError = require("../models/http-error");
 const config = require("../util/config");
 
 module.exports = (req, res, next) => {
+	//checks to see if the options method is passed first, and if so it moves it along
+	if (req.method === "OPTIONS") {
+		return next();
+	}
+
 	//token encoded in the header of the request to keep the url clean
 	try {
 		const token = req.headers.authorization.split(" ")[1]; //Authorization : 'Bearer TOKEN'

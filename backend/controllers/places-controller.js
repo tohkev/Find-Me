@@ -1,9 +1,8 @@
-const HttpError = require("../models/http-error");
-const { nanoid } = require("nanoid");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const fs = require("fs");
 
+const HttpError = require("../models/http-error");
 const getCoordsFromAddress = require("../util/location");
 const Place = require("../models/place");
 const User = require("../models/user");
@@ -65,16 +64,13 @@ async function createPlace(req, res, next) {
 	const errors = validationResult(req);
 
 	if (!errors.isEmpty()) {
-		const errorMessage = errors.errors.map(
-			(error) => `${error.param} ${error.msg}`
-		);
-		return next(new HttpError(errorMessage, 422));
+		const error = new HttpError("Error with validation", 422);
+		return next(err);
 	}
 
 	const { title, description, address, creator } = req.body;
 
 	let coordinates;
-
 	try {
 		coordinates = await getCoordsFromAddress(address);
 	} catch (error) {
@@ -91,7 +87,6 @@ async function createPlace(req, res, next) {
 	});
 
 	let user;
-
 	try {
 		user = await User.findById(creator);
 	} catch (err) {
@@ -109,7 +104,6 @@ async function createPlace(req, res, next) {
 		);
 		return next(error);
 	}
-	console.log(user);
 
 	try {
 		//using transactions and sessions to execute code that will be reversed if there is an error along the way
@@ -129,6 +123,7 @@ async function createPlace(req, res, next) {
 		);
 		return next(error);
 	}
+	console.log(user);
 
 	res.status(201).json(createdPlace);
 }
