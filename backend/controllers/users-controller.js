@@ -124,7 +124,7 @@ async function login(req, res, next) {
 		return next(
 			new HttpError(
 				"Could not identify user with those credentials.",
-				401
+				403
 			)
 		);
 	}
@@ -141,7 +141,7 @@ async function login(req, res, next) {
 	if (!isValidPassword) {
 		const error = new HttpError(
 			"Could not identify user with those credentials.",
-			401
+			403
 		);
 		return next(error);
 	}

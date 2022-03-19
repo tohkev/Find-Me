@@ -152,6 +152,15 @@ async function updatePlace(req, res, next) {
 		return next(error);
 	}
 
+	//Authorization: checking if a user's patch request is coming from the owner of the place
+	if (updatedPlace.creator.toString() !== req.userData.userId) {
+		const error = new HttpError(
+			"Unauthorized action. You cannot edit this place.",
+			401
+		);
+		return next(error);
+	}
+
 	updatedPlace.title = title;
 	updatedPlace.description = description;
 
@@ -173,7 +182,8 @@ async function deletePlace(req, res, next) {
 
 	let place;
 	try {
-		//populate allows us to access and work with data in a document in another document with the relation set up
+		//populate allows us to access and work with data in a document from another document with the relation set up
+		// populating creator would put the whole creator object linked to the place
 		place = await Place.findById(placeId).populate("creator");
 	} catch (err) {
 		const error = new HttpError(
@@ -185,6 +195,16 @@ async function deletePlace(req, res, next) {
 
 	if (!place) {
 		const error = new HttpError("Could not find place for this ID.", 404);
+		return next(error);
+	}
+
+	//Authorization: checking if a user's delete request is coming from the owner of the place
+	//we use creator.id here because it is not a mongoose object but a string already
+	if (place.creator.id !== req.userData.userId) {
+		const error = new HttpError(
+			"Unauthorized action. You cannot delete this place.",
+			401
+		);
 		return next(error);
 	}
 
