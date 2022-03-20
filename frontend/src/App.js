@@ -9,14 +9,23 @@ import {
 //route allows you to render a certain component based on the url path
 //redirect allows you to redirect the path when the one specified is unknown
 //switch allows you to render only one route if that route applies (if none, then it will use redirect)
-import Users from "./users/pages/Users";
-import NewPlace from "./places/pages/NewPlace";
+
+// import Users from "./users/pages/Users";
+// import NewPlace from "./places/pages/NewPlace";
+// import UserPlaces from "./places/pages/UserPlaces";
+// import UpdatePlace from "./places/pages/UpdatePlace";
+// import Auth from "./users/pages/Auth";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
-import UserPlaces from "./places/pages/UserPlaces";
-import UpdatePlace from "./places/pages/UpdatePlace";
-import Auth from "./users/pages/Auth";
+import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
 import { AuthContext } from "./shared/context/auth-context";
 import { useAuth } from "./shared/hooks/auth-hook";
+
+//laxily rendering these path for code splitting
+const Users = React.lazy(() => import("./users/pages/Users"));
+const UserPlaces = React.lazy(() => import("./places/pages/UserPlaces"));
+const NewPlace = React.lazy(() => import("./places/pages/NewPlace"));
+const UpdatePlace = React.lazy(() => import("./places/pages/UpdatePlace"));
+const Auth = React.lazy(() => import("./users/pages/Auth"));
 
 function App() {
 	const { token, login, logout, userId } = useAuth();
@@ -70,7 +79,19 @@ function App() {
 		>
 			<Router>
 				<MainNavigation />
-				<main>{routes}</main>
+				<main>
+					{
+						<React.Suspense
+							fallback={
+								<div className="center">
+									<LoadingSpinner />
+								</div>
+							}
+						>
+							{routes}
+						</React.Suspense>
+					}
+				</main>
 			</Router>
 		</AuthContext.Provider>
 	);
