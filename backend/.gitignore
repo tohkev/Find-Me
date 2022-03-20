@@ -4,4 +4,4 @@
 /node_modules
 /util/config.js
 /uploads/images
-
+nodemon.json
