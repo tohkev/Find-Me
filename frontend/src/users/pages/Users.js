@@ -13,7 +13,7 @@ function Users() {
 		async function getUsers() {
 			try {
 				const responseData = await sendRequest(
-					"http://localhost:5000/api/users"
+					process.env.REACT_APP_BACKEND_URL + "/users"
 				);
 
 				setLoadedUsers(responseData.users);

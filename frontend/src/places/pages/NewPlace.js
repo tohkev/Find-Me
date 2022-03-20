@@ -53,7 +53,7 @@ function NewPlace() {
 			formData.append("image", formState.inputs.image.value);
 
 			await sendRequest(
-				"http://localhost:5000/api/places",
+				process.env.REACT_APP_BACKEND_URL + "/places",
 				"POST",
 				//no headers needed as FormData automatically sends the needed headers
 				{ Authorization: `Bearer ${auth.token}` },
