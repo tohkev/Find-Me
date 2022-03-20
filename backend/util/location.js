@@ -4,7 +4,7 @@ const HttpError = require("../models/http-error");
 const config = require("./config");
 
 //YOUR API KEY HERE
-const API_KEY = config.geocodingApiKey;
+const API_KEY = config.googleApiKey;
 
 async function getCoordsFromAddress(address) {
 	const response = await axios.get(
