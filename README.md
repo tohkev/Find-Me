@@ -1,11 +1,11 @@
 # Find Me
 
-##Description:
+## Description:
 Find me a social website where users can share past destinations they have traveled to with their friends and many others. This website was deployed through Firebase (frontend) and Heroku (backend).
 
 You can visit the fully deployed site [here](https://ktoh-find-me.web.app/).
 
-##Technology Used:
+## Technology Used:
 
 -   React
     -   React DOM (+ Portals)
