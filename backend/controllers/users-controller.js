@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
-const config = require("../util/config");
 
 async function getUsers(req, res, next) {
 	let users;
@@ -17,11 +16,6 @@ async function getUsers(req, res, next) {
 			500
 		);
 		return next(error);
-	}
-
-	if (!users || users.length === 0) {
-		const error = new HttpError("No users found", 404);
-		next(error);
 	}
 
 	res.json({ users: users.map((user) => user.toObject({ getters: true })) });
@@ -90,7 +84,7 @@ async function signup(req, res, next) {
 	try {
 		token = jwt.sign(
 			{ userId: newUser.id, email: newUser.email },
-			config.privateKey,
+			process.env.JWT_KEY,
 			{ expiresIn: "1h" }
 		);
 	} catch (err) {
@@ -150,7 +144,7 @@ async function login(req, res, next) {
 	try {
 		token = jwt.sign(
 			{ userId: foundUser.id, email: foundUser.email },
-			config.privateKey,
+			process.env.JWT_KEY,
 			{ expiresIn: "1h" }
 		);
 	} catch (err) {

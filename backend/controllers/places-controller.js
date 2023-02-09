@@ -6,6 +6,7 @@ const HttpError = require("../models/http-error");
 const getCoordsFromAddress = require("../util/location");
 const Place = require("../models/place");
 const User = require("../models/user");
+const { cloudinary } = require("../util/cloudinaryConfig");
 
 async function getPlaceById(req, res, next) {
 	const placeId = req.params.pid;
@@ -208,7 +209,8 @@ async function deletePlace(req, res, next) {
 		return next(error);
 	}
 
-	const imagePath = place.image;
+	const imagePath = place.image.split("/");
+	const imageId = imagePath[imagePath.length - 1].split(".")[0];
 
 	try {
 		const session = await mongoose.startSession();
@@ -227,9 +229,14 @@ async function deletePlace(req, res, next) {
 		return next(error);
 	}
 
-	fs.unlink(imagePath, (err) => {
-		console.log(err);
-	});
+	//cleans up places pictures when deleted.
+	cloudinary.uploader.destroy(
+		"find-me/" + imageId,
+		{ invalidate: true, resource_type: "image" },
+		(res) => {
+			console.log(`Deleted ${imageId}`);
+		}
+	);
 
 	res.status(200).json({ message: "Deleted place." });
 }

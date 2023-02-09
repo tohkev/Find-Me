@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 
 const HttpError = require("../models/http-error");
-const config = require("../util/config");
 
 module.exports = (req, res, next) => {
 	//checks to see if the options method is passed first, and if so it moves it along
@@ -16,7 +15,7 @@ module.exports = (req, res, next) => {
 			throw new Error("Authentication failed!", 403);
 		}
 
-		const decodedToken = jwt.verify(token, config.privateKey); //returns payload
+		const decodedToken = jwt.verify(token, process.env.JWT_KEY); //returns payload
 		//adding user date to the request
 		req.userData = { userId: decodedToken.userId };
 		next();
